@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // Notation: ∈
 // Meaning:  is a member of
@@ -135,7 +138,7 @@ type tree struct {
 //
 func ThePowerSetOfA() {
 	//var powerSet
-	A := []int{-1, 3}
+	A := []int{-1, 3, 5}
 
 	t := &tree{
 		set: []int{},
@@ -143,27 +146,27 @@ func ThePowerSetOfA() {
 
 	for _, el := range A {
 		t = expand(el, t)
-		//t = dontAdd(el, t)
 	}
-	var i int
-	i = 0
-	//powerSet := make(map[int][]int)
-	powerSet := make(map[int][]int)
-
-	powerSet = groupSets(t, powerSet, &i)
-
-	// for each set if not already duplicated
-
-	fmt.Println(powerSet)
+	rawPowerSet := make(map[string]bool)
+	rawPowerSet = groupSets(t, rawPowerSet)
+	var sets []string
+	var result string
+	result = "\nP(%v) = {%v}"
+	for k, _ := range rawPowerSet {
+		set := strings.ReplaceAll(k, "[", "{")
+		set = strings.ReplaceAll(set, "]", "}")
+		sets = append(sets, set)
+	}
+	fmt.Printf(result, A, sets)
 }
 
-func groupSets(t *tree, r map[int][]int, i *int) map[int][]int {
+func groupSets(t *tree, r map[string]bool) map[string]bool {
 	if t != nil {
-		*i++
-		r[*i] = t.set
+		k := fmt.Sprintf("%v", t.set)
+		r[k] = true
 		// some sets are repeated as they are the previous step in the tree, I should filter duplicates out for printing sake
-		groupSets(t.left, r, i)
-		groupSets(t.right, r, i)
+		groupSets(t.left, r)
+		groupSets(t.right, r)
 	}
 	return r
 }
